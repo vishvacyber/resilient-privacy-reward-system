@@ -13,19 +13,19 @@ let lastActivity = Date.now();
 
 // Intern data - 13 interns in alphabetical order (starting with zero points)
 const interns = [
-    { name: "Amrutha Pemmasani", points: 0, badges: [], headshot: null },
-    { name: "Ankita Chouksey", points: 0, badges: [], headshot: null },
-    { name: "Charan Kumar Rayaprolu", points: 0, badges: [], headshot: null },
-    { name: "Dishant Modi", points: 0, badges: [], headshot: null },
-    { name: "Ishan Mehta", points: 0, badges: [], headshot: null },
-    { name: "Khushi Digarse", points: 0, badges: [], headshot: null },
-    { name: "Mrudula Jethe Bhanushali", points: 0, badges: [], headshot: null },
-    { name: "Nirusha Kandela", points: 0, badges: [], headshot: null },
-    { name: "Nirmit Pradip Patel", points: 0, badges: [], headshot: null },
-    { name: "Rachna Patel", points: 0, badges: [], headshot: null },
-    { name: "Tanmayee Arigala", points: 0, badges: [], headshot: null },
-    { name: "Varun Muriki", points: 0, badges: [], headshot: null },
-    { name: "Zeel Patel", points: 0, badges: [], headshot: null }
+    { name: "Amrutha Pemmasani", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Ankita Chouksey", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Charan Kumar Rayaprolu", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Dishant Modi", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Ishan Mehta", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Khushi Digarse", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Mrudula Jethe Bhanushali", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Nirusha Kandela", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Nirmit Pradip Patel", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Rachna Patel", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Tanmayee Arigala", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Varun Muriki", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Zeel Patel", points: 0, badges: [], headshot: null, designation: "Software Development Intern" }
 ];
 
 // Initialize the application
@@ -73,6 +73,8 @@ function loadSavedData() {
                     if (existingIntern) {
                         existingIntern.points = savedIntern.points || 0;
                         existingIntern.badges = savedIntern.badges || [];
+                        existingIntern.headshot = savedIntern.headshot || null;
+                        existingIntern.designation = savedIntern.designation || "Software Development Intern";
                     }
                 });
             }
@@ -162,7 +164,10 @@ function updateLeaderboard(interns) {
         
         entry.innerHTML = `
             <div class="rank-number ${rankClass}">${rank}</div>
-            <div class="intern-name">${intern.name}</div>
+            <div class="intern-info">
+                <div class="intern-name">${intern.name}</div>
+                <div class="intern-designation">${intern.designation || 'Intern'}</div>
+            </div>
             <div class="points-display">${intern.points}</div>
             <div class="badges-display">${generateBadgesHTML(intern.badges)}</div>
         `;
@@ -197,7 +202,8 @@ function updateInternCards(interns) {
         
         // Create avatar with headshot or initials fallback
         const avatarContent = intern.headshot 
-            ? `<img src="${intern.headshot}" alt="${intern.name}" class="headshot-image">`
+            ? `<img src="${intern.headshot}" alt="${intern.name}" class="headshot-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+               <span class="avatar-initials" style="display: none;">${initials}</span>`
             : `<span class="avatar-initials">${initials}</span>`;
         
         card.innerHTML = `
@@ -205,6 +211,7 @@ function updateInternCards(interns) {
                 <div class="card-avatar">${avatarContent}</div>
                 <div class="card-info">
                     <h3>${intern.name}</h3>
+                    <p class="designation">${intern.designation || 'Intern'}</p>
                     ${rankDisplay}
                 </div>
             </div>
@@ -345,6 +352,9 @@ function addPoints(internName, points, badge = null) {
         updatePodium(sortedInterns);
         updateLeaderboard(sortedInterns);
         updateInternCards(sortedInterns);
+        
+        // Save data automatically
+        saveDataSilently();
     }
 }
 
@@ -588,10 +598,12 @@ function initializeAdminPanel() {
     const internSelect = document.getElementById('intern-select');
     const badgeInternSelect = document.getElementById('badge-intern-select');
     const removeUserSelect = document.getElementById('remove-user-select');
+    const designationInternSelect = document.getElementById('designation-intern-select');
     
     internSelect.innerHTML = '<option value="">Choose an intern...</option>';
     badgeInternSelect.innerHTML = '<option value="">Choose an intern...</option>';
     removeUserSelect.innerHTML = '<option value="">Choose an intern to remove...</option>';
+    designationInternSelect.innerHTML = '<option value="">Choose an intern...</option>';
     
     interns.forEach(intern => {
         const option1 = document.createElement('option');
@@ -608,6 +620,11 @@ function initializeAdminPanel() {
         option3.value = intern.name;
         option3.textContent = intern.name;
         removeUserSelect.appendChild(option3);
+        
+        const option4 = document.createElement('option');
+        option4.value = intern.name;
+        option4.textContent = intern.name;
+        designationInternSelect.appendChild(option4);
     });
     
     // Add event listeners
@@ -632,6 +649,10 @@ function initializeAdminPanel() {
     // Add bulk upload functionality
     document.getElementById('bulk-upload-btn').addEventListener('click', processBulkUpload);
     document.getElementById('clear-headshots-btn').addEventListener('click', clearAllHeadshots);
+    
+    // Add designation management functionality
+    document.getElementById('update-designation-btn').addEventListener('click', updateDesignation);
+    document.getElementById('reset-designation-btn').addEventListener('click', resetDesignation);
     
     // Update admin stats
     const sortedInterns = [...interns].sort((a, b) => b.points - a.points);
@@ -851,7 +872,8 @@ function addUser() {
                 name: newUserName,
                 points: 0,
                 badges: [],
-                headshot: headshotDataUrl
+                headshot: headshotDataUrl,
+                designation: "Software Development Intern"
             };
             
             interns.push(newIntern);
@@ -870,6 +892,9 @@ function addUser() {
             // Update dropdowns
             updateAdminDropdowns();
             
+            // Save data automatically
+            saveDataSilently();
+            
             // Clear form
             document.getElementById('new-user-name').value = '';
             headshotInput.value = '';
@@ -886,7 +911,8 @@ function addUser() {
             name: newUserName,
             points: 0,
             badges: [],
-            headshot: null
+            headshot: null,
+            designation: "Software Development Intern"
         };
         
         interns.push(newIntern);
@@ -904,6 +930,9 @@ function addUser() {
         
         // Update dropdowns
         updateAdminDropdowns();
+        
+        // Save data automatically
+        saveDataSilently();
         
         // Clear form
         document.getElementById('new-user-name').value = '';
@@ -965,11 +994,13 @@ function updateAdminDropdowns() {
     const internSelect = document.getElementById('intern-select');
     const badgeInternSelect = document.getElementById('badge-intern-select');
     const removeUserSelect = document.getElementById('remove-user-select');
+    const designationInternSelect = document.getElementById('designation-intern-select');
     
     // Clear existing options (except first option)
     internSelect.innerHTML = '<option value="">Choose an intern...</option>';
     badgeInternSelect.innerHTML = '<option value="">Choose an intern...</option>';
     removeUserSelect.innerHTML = '<option value="">Choose an intern to remove...</option>';
+    designationInternSelect.innerHTML = '<option value="">Choose an intern...</option>';
     
     // Add current interns
     interns.forEach(intern => {
@@ -987,6 +1018,11 @@ function updateAdminDropdowns() {
         option3.value = intern.name;
         option3.textContent = intern.name;
         removeUserSelect.appendChild(option3);
+        
+        const option4 = document.createElement('option');
+        option4.value = intern.name;
+        option4.textContent = intern.name;
+        designationInternSelect.appendChild(option4);
     });
 }
 
@@ -1002,12 +1038,25 @@ function saveData() {
         localStorage.setItem('rewardData', JSON.stringify({
             interns: interns,
             lastSaved: new Date().toISOString(),
-            version: '1.0'
+            version: '2.1.1'
         }));
         
         showMessage('Data saved successfully!', 'success');
     } catch (error) {
         showMessage('Error saving data!', 'error');
+    }
+}
+
+function saveDataSilently() {
+    // Save data without showing messages (for automatic saves)
+    try {
+        localStorage.setItem('rewardData', JSON.stringify({
+            interns: interns,
+            lastSaved: new Date().toISOString(),
+            version: '2.1.1'
+        }));
+    } catch (error) {
+        console.error('Error saving data silently:', error);
     }
 }
 
@@ -1203,6 +1252,7 @@ function processBulkUpload() {
                 if (processedCount === totalFiles) {
                     displayBulkUploadResults(results);
                     updateAllDisplays();
+                    saveDataSilently();
                 }
             };
             reader.onerror = function() {
@@ -1278,6 +1328,7 @@ function clearAllHeadshots() {
         });
         
         updateAllDisplays();
+        saveDataSilently();
         showMessage('All headshots have been cleared!', 'success');
     }
 }
@@ -1294,3 +1345,113 @@ function updateAllDisplays() {
         updateAdminStats(sortedInterns);
     });
 }
+
+// Designation management functions
+function updateDesignation() {
+    // Check authentication
+    if (!isAuthenticated) {
+        showMessage('Please login to access admin features!', 'error');
+        return;
+    }
+    
+    const internSelect = document.getElementById('designation-intern-select');
+    const newDesignationInput = document.getElementById('new-designation');
+    
+    const selectedInternName = internSelect.value;
+    const newDesignation = newDesignationInput.value.trim();
+    
+    if (!selectedInternName) {
+        showMessage('Please select an intern!', 'error');
+        return;
+    }
+    
+    if (!newDesignation) {
+        showMessage('Please enter a designation!', 'error');
+        return;
+    }
+    
+    // Find and update the intern
+    const intern = interns.find(i => i.name === selectedInternName);
+    if (intern) {
+        const oldDesignation = intern.designation;
+        intern.designation = newDesignation;
+        
+        // Update all displays
+        updateAllDisplays();
+        
+        // Save data automatically
+        saveDataSilently();
+        
+        // Clear form
+        internSelect.value = '';
+        newDesignationInput.value = '';
+        
+        showMessage(`Successfully updated ${selectedInternName}'s designation from "${oldDesignation}" to "${newDesignation}"!`, 'success');
+    } else {
+        showMessage('Intern not found!', 'error');
+    }
+}
+
+function resetDesignation() {
+    // Check authentication
+    if (!isAuthenticated) {
+        showMessage('Please login to access admin features!', 'error');
+        return;
+    }
+    
+    const internSelect = document.getElementById('designation-intern-select');
+    const selectedInternName = internSelect.value;
+    
+    if (!selectedInternName) {
+        showMessage('Please select an intern!', 'error');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to reset ${selectedInternName}'s designation to "Software Development Intern"?`)) {
+        // Find and update the intern
+        const intern = interns.find(i => i.name === selectedInternName);
+        if (intern) {
+            const oldDesignation = intern.designation;
+            intern.designation = "Software Development Intern";
+            
+            // Update all displays
+            updateAllDisplays();
+            
+            // Save data automatically
+            saveDataSilently();
+            
+            // Clear form
+            internSelect.value = '';
+            document.getElementById('new-designation').value = '';
+            
+            showMessage(`Successfully reset ${selectedInternName}'s designation from "${oldDesignation}" to "Software Development Intern"!`, 'success');
+        } else {
+            showMessage('Intern not found!', 'error');
+        }
+    }
+}
+
+// Test function to check image display
+function testImageDisplay() {
+    console.log('Testing image display...');
+    console.log('Interns with headshots:', interns.filter(i => i.headshot).length);
+    console.log('Total interns:', interns.length);
+    
+    // Check if any intern has a headshot
+    const internWithHeadshot = interns.find(i => i.headshot);
+    if (internWithHeadshot) {
+        console.log('Found intern with headshot:', internWithHeadshot.name);
+        console.log('Headshot data:', internWithHeadshot.headshot.substring(0, 50) + '...');
+    } else {
+        console.log('No interns have headshots yet');
+    }
+}
+
+// Initialize everything when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initializeAuthentication();
+    initializeAdminPanel();
+    
+    // Test image display after a short delay
+    setTimeout(testImageDisplay, 1000);
+});

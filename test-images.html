@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Display Test - Resilient Privacy Inc.</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin: 10px;
+        }
+        .test-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 10px;
+            border: 2px solid #667eea;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5a6fd8;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🖼️ Image Display Test</h1>
+        <p>This page helps debug image display issues in the reward system.</p>
+        
+        <div class="test-section">
+            <h3>1. Basic Avatar Test</h3>
+            <p>Testing basic avatar display with initials:</p>
+            <div class="avatar">JD</div>
+            <div class="status success">✅ Basic avatar display working</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. Image Loading Test</h3>
+            <p>Testing image loading with a sample image:</p>
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMzAiIGZpbGw9IiM2NjdlZWEiLz4KPHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5URVNUPC90ZXh0Pgo8L3N2Zz4K" 
+                 alt="Test Image" class="test-image" 
+                 onload="document.getElementById('image-status').innerHTML='✅ Image loading working'"
+                 onerror="document.getElementById('image-status').innerHTML='❌ Image loading failed'">
+            <div id="image-status" class="status info">⏳ Testing image loading...</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. Intern Data Test</h3>
+            <p>Testing intern data structure:</p>
+            <button onclick="testInternData()">Test Intern Data</button>
+            <div id="intern-status" class="status info">Click button to test</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. Headshot Upload Test</h3>
+            <p>Test headshot upload functionality:</p>
+            <input type="file" id="test-file" accept="image/*" onchange="testFileUpload()">
+            <div id="upload-status" class="status info">Select an image file to test</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>5. Console Debug</h3>
+            <p>Check browser console (F12) for detailed debug information.</p>
+            <button onclick="runDebugTests()">Run Debug Tests</button>
+            <div id="debug-status" class="status info">Click button to run debug tests</div>
+        </div>
+    </div>
+
+    <script>
+        // Test intern data
+        function testInternData() {
+            const status = document.getElementById('intern-status');
+            try {
+                // Check if main script is loaded
+                if (typeof interns !== 'undefined') {
+                    const totalInterns = interns.length;
+                    const internsWithHeadshots = interns.filter(i => i.headshot).length;
+                    const internsWithDesignations = interns.filter(i => i.designation).length;
+                    
+                    status.innerHTML = `
+                        ✅ Intern data loaded successfully<br>
+                        📊 Total interns: ${totalInterns}<br>
+                        🖼️ With headshots: ${internsWithHeadshots}<br>
+                        🏷️ With designations: ${internsWithDesignations}
+                    `;
+                    status.className = 'status success';
+                } else {
+                    status.innerHTML = '❌ Main script not loaded - open main page first';
+                    status.className = 'status error';
+                }
+            } catch (error) {
+                status.innerHTML = `❌ Error: ${error.message}`;
+                status.className = 'status error';
+            }
+        }
+        
+        // Test file upload
+        function testFileUpload() {
+            const fileInput = document.getElementById('test-file');
+            const status = document.getElementById('upload-status');
+            
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const dataUrl = e.target.result;
+                    status.innerHTML = `
+                        ✅ File upload successful<br>
+                        📁 File: ${file.name}<br>
+                        📏 Size: ${file.size} bytes<br>
+                        🖼️ Type: ${file.type}<br>
+                        📊 Data URL length: ${dataUrl.length} characters
+                    `;
+                    status.className = 'status success';
+                    
+                    // Test displaying the image
+                    const testImg = document.createElement('img');
+                    testImg.src = dataUrl;
+                    testImg.className = 'test-image';
+                    testImg.onload = function() {
+                        status.innerHTML += '<br>✅ Image display test passed';
+                    };
+                    testImg.onerror = function() {
+                        status.innerHTML += '<br>❌ Image display test failed';
+                        status.className = 'status error';
+                    };
+                    document.querySelector('.test-section:nth-child(4)').appendChild(testImg);
+                };
+                
+                reader.onerror = function() {
+                    status.innerHTML = '❌ File read error';
+                    status.className = 'status error';
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // Run debug tests
+        function runDebugTests() {
+            const status = document.getElementById('debug-status');
+            console.log('=== DEBUG TESTS START ===');
+            
+            // Test 1: Check if main script is loaded
+            if (typeof interns !== 'undefined') {
+                console.log('✅ Main script loaded');
+                console.log('Interns data:', interns);
+                
+                // Test 2: Check intern structure
+                if (interns.length > 0) {
+                    const firstIntern = interns[0];
+                    console.log('✅ First intern:', firstIntern);
+                    console.log('Has headshot:', !!firstIntern.headshot);
+                    console.log('Has designation:', !!firstIntern.designation);
+                }
+                
+                status.innerHTML = '✅ Debug tests completed - check console for details';
+                status.className = 'status success';
+            } else {
+                console.log('❌ Main script not loaded');
+                status.innerHTML = '❌ Main script not loaded - open main page first';
+                status.className = 'status error';
+            }
+            
+            console.log('=== DEBUG TESTS END ===');
+        }
+        
+        // Auto-run basic tests
+        window.onload = function() {
+            console.log('Image test page loaded');
+            setTimeout(testInternData, 500);
+        };
+    </script>
+</body>
+</html>
