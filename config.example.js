@@ -5,8 +5,8 @@
 const PRODUCTION_CONFIG = {
     // Admin credentials - CHANGE THESE FOR PRODUCTION
     adminCredentials: {
-        username: 'your_secure_username_here',
-        password: 'your_secure_password_here'
+        username: 'admin',
+        password: 'admin123'
     },
     
     // Session settings

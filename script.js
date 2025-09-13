@@ -460,6 +460,11 @@ function handleLogin(event) {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     
+    // Debug logging
+    console.log('Login attempt:', { username, password });
+    console.log('Expected credentials:', ADMIN_CREDENTIALS);
+    console.log('Config loaded:', typeof PRODUCTION_CONFIG !== 'undefined');
+    
     if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
         // Successful login
         isAuthenticated = true;
