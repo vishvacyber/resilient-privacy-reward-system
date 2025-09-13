@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Intern Reward Program - Track achievements and celebrate excellence at Resilient Privacy Inc.">
+    <meta name="keywords" content="intern, reward, points, achievements, resilient privacy">
+    <meta name="author" content="Resilient Privacy Inc.">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#22c55e">
+    <meta property="og:title" content="Intern Reward Program - Resilient Privacy Inc.">
+    <meta property="og:description" content="Track achievements and celebrate excellence">
+    <meta property="og:type" content="website">
+    <title>Reward Points - Resilient Privacy Inc.</title>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
+    <link rel="stylesheet" href="styles.css?v=2.0.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="config.js" defer></script>
+</head>
+<body>
+    <!-- Login Toggle -->
+    <div class="admin-toggle">
+        <button id="admin-toggle-btn" class="admin-btn">
+            <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="login-modal hidden">
+        <div class="login-content">
+            <div class="login-header">
+                <h2><i class="fas fa-shield-alt"></i> Admin Login</h2>
+                <p>Resilient Privacy Inc. - Reward System</p>
+            </div>
+            
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <div id="login-error" class="error-message hidden">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Invalid username or password</span>
+                </div>
+                
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+            
+            <div class="login-footer">
+                <button id="cancel-login" class="cancel-btn">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="admin-panel" class="admin-panel hidden">
+        <div class="admin-header">
+            <h2><i class="fas fa-user-shield"></i> Management Panel</h2>
+            <div class="admin-header-actions">
+                <span class="admin-user">Welcome, Root</span>
+                <span id="session-timer" class="session-timer" title="Session expires in"></span>
+                <button id="close-admin" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="admin-content">
+            <!-- Point Management Section -->
+            <div class="admin-section">
+                <h3><i class="fas fa-calculator"></i> Point Management</h3>
+                <div class="form-group">
+                    <label for="intern-select">Select Intern:</label>
+                    <select id="intern-select">
+                        <option value="">Choose an intern...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="points-input">Points to Adjust:</label>
+                    <input type="number" id="points-input" min="-1000" max="1000" placeholder="Enter points (+/-)">
+                    <small class="help-text">Use positive numbers to add points, negative to remove</small>
+                </div>
+                <div class="action-buttons">
+                    <button id="award-points-btn" class="award-btn">
+                        <i class="fas fa-plus"></i> Add Points
+                    </button>
+                    <button id="remove-points-btn" class="remove-btn">
+                        <i class="fas fa-minus"></i> Remove Points
+                    </button>
+                </div>
+            </div>
+
+            <!-- Badge Management Section -->
+            <div class="admin-section">
+                <h3><i class="fas fa-medal"></i> Badge Management</h3>
+                <div class="form-group">
+                    <label for="badge-intern-select">Select Intern:</label>
+                    <select id="badge-intern-select">
+                        <option value="">Choose an intern...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="badge-select">Badge Type:</label>
+                    <select id="badge-select">
+                        <option value="">Choose a badge...</option>
+                        <option value="gold">🏆 Top Performer</option>
+                        <option value="silver">🥈 Consistent Excellence</option>
+                        <option value="bronze">🥉 Rising Star</option>
+                        <option value="blue">💡 Innovation</option>
+                    </select>
+                </div>
+                <div class="action-buttons">
+                    <button id="add-badge-btn" class="badge-btn">
+                        <i class="fas fa-plus"></i> Add Badge
+                    </button>
+                    <button id="remove-badge-btn" class="remove-badge-btn">
+                        <i class="fas fa-minus"></i> Remove Badge
+                    </button>
+                </div>
+            </div>
+
+            <!-- User Management Section -->
+            <div class="admin-section">
+                <h3><i class="fas fa-users-cog"></i> User Management</h3>
+            <div class="form-group">
+                <label for="new-user-name">Add New Intern:</label>
+                <input type="text" id="new-user-name" placeholder="Enter full name (e.g., John Doe)">
+            </div>
+            <div class="form-group">
+                <label for="new-user-headshot">Headshot (Optional):</label>
+                <input type="file" id="new-user-headshot" accept="image/*" class="file-input">
+                <div class="file-preview" id="new-user-preview"></div>
+            </div>
+                <div class="form-group">
+                    <label for="remove-user-select">Remove Intern:</label>
+                    <select id="remove-user-select">
+                        <option value="">Choose an intern to remove...</option>
+                    </select>
+                </div>
+            <div class="action-buttons">
+                <button id="add-user-btn" class="award-btn">
+                    <i class="fas fa-user-plus"></i> Add Intern
+                </button>
+                <button id="remove-user-btn" class="remove-btn">
+                    <i class="fas fa-user-minus"></i> Remove Intern
+                </button>
+            </div>
+        </div>
+
+        <!-- Bulk Headshot Upload Section -->
+        <div class="admin-section">
+            <h3><i class="fas fa-images"></i> Bulk Headshot Upload</h3>
+            <div class="form-group">
+                <label for="bulk-headshot-upload">Upload Multiple Headshots:</label>
+                <input type="file" id="bulk-headshot-upload" accept="image/*" multiple class="file-input">
+                <div class="upload-instructions">
+                    <h4>Naming Convention:</h4>
+                    <p>Save your images with these exact names:</p>
+                    <ul class="naming-list">
+                        <li><code>Amrutha_Pemmasani.jpg</code></li>
+                        <li><code>Ankita_Chouksey.jpg</code></li>
+                        <li><code>Charan_Kumar_Rayaprolu.jpg</code></li>
+                        <li><code>Dishant_Modi.jpg</code></li>
+                        <li><code>Ishan_Mehta.jpg</code></li>
+                        <li><code>Khushi_Digarse.jpg</code></li>
+                        <li><code>Mrudula_Jethe_Bhanushali.jpg</code></li>
+                        <li><code>Nirusha_Kandela.jpg</code></li>
+                        <li><code>Nirmit_Pradip_Patel.jpg</code></li>
+                        <li><code>Rachna_Patel.jpg</code></li>
+                        <li><code>Tanmayee_Arigala.jpg</code></li>
+                        <li><code>Varun_Muriki.jpg</code></li>
+                        <li><code>Zeel_Patel.jpg</code></li>
+                    </ul>
+                    <p><strong>Note:</strong> Use underscores instead of spaces, and any image format (jpg, png, gif) works.</p>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button id="bulk-upload-btn" class="award-btn">
+                    <i class="fas fa-upload"></i> Process Bulk Upload
+                </button>
+                <button id="clear-headshots-btn" class="remove-btn">
+                    <i class="fas fa-trash"></i> Clear All Headshots
+                </button>
+            </div>
+            <div id="bulk-upload-results" class="upload-results"></div>
+        </div>
+
+            <!-- Quick Actions -->
+            <div class="admin-section">
+                <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                <div class="quick-actions">
+                    <button id="save-data-btn" class="action-btn save">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <button id="reset-all-btn" class="action-btn danger">
+                        <i class="fas fa-undo"></i> Reset All Points
+                    </button>
+                    <button id="export-data-btn" class="action-btn">
+                        <i class="fas fa-download"></i> Export Data
+                    </button>
+                    <button id="import-data-btn" class="action-btn">
+                        <i class="fas fa-upload"></i> Import Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Current Status -->
+            <div class="admin-section">
+                <h3><i class="fas fa-chart-bar"></i> Current Status</h3>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="status-label">Total Points:</span>
+                        <span id="admin-total-points">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Active Interns:</span>
+                        <span>13</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Top Performer:</span>
+                        <span id="admin-top-performer">-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Logout Section -->
+            <div class="admin-section logout-section">
+                <button id="logout-btn" class="logout-btn-bottom" title="Click to Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="logout-text">Logout</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="header-content">
+                <div class="company-logo">
+                    <h1 class="brand-title">
+                        <span class="brand-resilient">Resilient</span>
+                        <span class="brand-privacy">Privacy</span>
+                    </h1>
+                </div>
+                <div class="header-subtitle">
+                    <h2>Intern Reward Program</h2>
+                    <p>Celebrating Excellence & Achievement</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Overview -->
+        <section class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>13</h3>
+                    <p>Active Interns</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="total-points">0</h3>
+                    <p>Total Points</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="top-performer">-</h3>
+                    <p>Top Performer</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Leaderboard Section -->
+        <section class="leaderboard">
+            <div class="section-header">
+                <h2><i class="fas fa-crown"></i> Leaderboard</h2>
+                <p>Track your progress and celebrate achievements</p>
+            </div>
+            
+            <div class="leaderboard-container">
+                <!-- Top 3 Podium -->
+                <div class="podium">
+                    <div class="podium-place second">
+                        <div class="podium-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="podium-info">
+                            <span class="rank">2nd</span>
+                            <span class="name" id="second-place">-</span>
+                            <span class="points" id="second-points">0 pts</span>
+                        </div>
+                    </div>
+                    
+                    <div class="podium-place first">
+                        <div class="podium-avatar">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="podium-info">
+                            <span class="rank">1st</span>
+                            <span class="name" id="first-place">-</span>
+                            <span class="points" id="first-points">0 pts</span>
+                        </div>
+                    </div>
+                    
+                    <div class="podium-place third">
+                        <div class="podium-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="podium-info">
+                            <span class="rank">3rd</span>
+                            <span class="name" id="third-place">-</span>
+                            <span class="points" id="third-points">0 pts</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Full Leaderboard List -->
+                <div class="leaderboard-list">
+                    <div class="list-header">
+                        <span>Rank</span>
+                        <span>Intern Name</span>
+                        <span>Points</span>
+                        <span>Badges</span>
+                    </div>
+                    <div id="leaderboard-entries">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Individual Intern Cards -->
+        <section class="intern-cards">
+            <div class="section-header">
+                <h2><i class="fas fa-id-badge"></i> Intern Profiles</h2>
+                <p>Detailed view of each intern's achievements</p>
+            </div>
+            
+            <div class="cards-grid" id="intern-cards-grid">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+        </section>
+
+        <!-- Achievement Badges Section -->
+        <section class="achievements">
+            <div class="section-header">
+                <h2><i class="fas fa-medal"></i> Achievement Badges</h2>
+                <p>Special recognition for outstanding performance</p>
+            </div>
+            
+            <div class="badges-grid">
+                <div class="badge-item">
+                    <div class="badge-icon gold">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h4>Top Performer</h4>
+                    <p>Highest points in the program</p>
+                </div>
+                <div class="badge-item">
+                    <div class="badge-icon silver">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h4>Consistent Excellence</h4>
+                    <p>Regular high performance</p>
+                </div>
+                <div class="badge-item">
+                    <div class="badge-icon bronze">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h4>Rising Star</h4>
+                    <p>Most improved performance</p>
+                </div>
+                <div class="badge-item">
+                    <div class="badge-icon blue">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h4>Innovation</h4>
+                    <p>Creative problem solving</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="company-info">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Resilient Privacy Inc.</span>
+                </div>
+                <p>&copy; 2025 Intern Reward Program. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js?v=2.0.0" defer></script>
+</body>
+</html>
