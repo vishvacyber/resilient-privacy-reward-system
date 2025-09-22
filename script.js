@@ -14,15 +14,15 @@ let lastActivity = Date.now();
 // Intern data - 13 interns in alphabetical order (starting with zero points)
 const interns = [
     { name: "Amrutha Pemmasani", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Ankita Chouksey", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Ankita Chouksey", points: 0, badges: [], headshot: null, designation: "Business Development Intern" },
     { name: "Charan Kumar Rayaprolu", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
     { name: "Dishant Modi", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
     { name: "Ishan Mehta", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Khushi Digarse", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Khushi Digarse", points: 0, badges: [], headshot: null, designation: "Project Manager and BDM Intern" },
     { name: "Mrudula Jethe Bhanushali", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
     { name: "Nirusha Kandela", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
     { name: "Nirmit Pradip Patel", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Rachna Patel", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Rachna Patel", points: 0, badges: [], headshot: null, designation: "Business Development Intern" },
     { name: "Tanmayee Arigala", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
     { name: "Varun Muriki", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
     { name: "Zeel Patel", points: 0, badges: [], headshot: null, designation: "Software Development Intern" }
@@ -162,15 +162,41 @@ function updateLeaderboard(interns) {
         const rank = index + 1;
         const rankClass = rank <= 3 ? 'top-three' : '';
         
-        entry.innerHTML = `
-            <div class="rank-number ${rankClass}">${rank}</div>
-            <div class="intern-info">
-                <div class="intern-name">${intern.name}</div>
-                <div class="intern-designation">${intern.designation || 'Intern'}</div>
-            </div>
-            <div class="points-display">${intern.points}</div>
-            <div class="badges-display">${generateBadgesHTML(intern.badges)}</div>
-        `;
+        // Create elements safely to avoid XSS
+        const rankDiv = document.createElement('div');
+        rankDiv.className = `rank-number ${rankClass}`;
+        rankDiv.textContent = rank;
+        
+        const internInfoDiv = document.createElement('div');
+        internInfoDiv.className = 'intern-info';
+        
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'intern-name';
+        nameDiv.textContent = intern.name;
+        
+        const designationDiv = document.createElement('div');
+        designationDiv.className = 'intern-designation';
+        designationDiv.textContent = intern.designation || 'Intern';
+        
+        internInfoDiv.appendChild(nameDiv);
+        internInfoDiv.appendChild(designationDiv);
+        
+        const pointsDiv = document.createElement('div');
+        pointsDiv.className = 'points-display';
+        pointsDiv.textContent = intern.points;
+        
+        const badgesDiv = document.createElement('div');
+        badgesDiv.className = 'badges-display';
+        // Add badges safely
+        const badges = generateBadgesHTML(intern.badges);
+        if (badges) {
+            badgesDiv.innerHTML = badges;
+        }
+        
+        entry.appendChild(rankDiv);
+        entry.appendChild(internInfoDiv);
+        entry.appendChild(pointsDiv);
+        entry.appendChild(badgesDiv);
         
         leaderboardContainer.appendChild(entry);
     });
@@ -178,41 +204,22 @@ function updateLeaderboard(interns) {
 
 function updateInternCards(interns) {
     const cardsContainer = document.getElementById('intern-cards-grid');
+    if (!cardsContainer) return;
+    
     cardsContainer.innerHTML = '';
-    
-    // Create a map of points to rank for proper ranking
-    const pointsToRank = {};
-    const uniquePoints = [...new Set(interns.map(intern => intern.points))].sort((a, b) => b - a);
-    
-    uniquePoints.forEach((points, index) => {
-        pointsToRank[points] = index + 1;
-    });
     
     interns.forEach((intern, index) => {
         const card = document.createElement('div');
         card.className = 'intern-card';
-        card.style.animationDelay = `${index * 0.1}s`;
-        
-        // Use actual rank based on points, not array index
-        const rank = pointsToRank[intern.points];
-        const initials = intern.name.split(' ').map(n => n[0]).join('');
-        
-        // Only show rank if intern has points
-        const rankDisplay = intern.points > 0 ? `<span class="rank">Rank #${rank}</span>` : `<span class="rank no-rank">No Rank Yet</span>`;
-        
-        // Create avatar with headshot or initials fallback
-        const avatarContent = intern.headshot 
-            ? `<img src="${intern.headshot}" alt="${intern.name}" class="headshot-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-               <span class="avatar-initials" style="display: none;">${initials}</span>`
-            : `<span class="avatar-initials">${initials}</span>`;
-        
         card.innerHTML = `
             <div class="card-header">
-                <div class="card-avatar">${avatarContent}</div>
+                <div class="card-avatar">
+                    <span class="avatar-initials">${intern.name.split(' ').map(n => n[0]).join('')}</span>
+                </div>
                 <div class="card-info">
                     <h3>${intern.name}</h3>
                     <p class="designation">${intern.designation || 'Intern'}</p>
-                    ${rankDisplay}
+                    <span class="rank no-rank">No Rank Yet</span>
                 </div>
             </div>
             <div class="card-stats">
@@ -226,7 +233,7 @@ function updateInternCards(interns) {
                 </div>
             </div>
             <div class="card-badges">
-                ${generateBadgesHTML(intern.badges, true)}
+                <span class="card-badge" style="background: #e2e8f0; color: #718096;">No badges yet</span>
             </div>
         `;
         
@@ -1189,10 +1196,18 @@ function handleFilePreview(event) {
     if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            preview.innerHTML = `
-                <img src="${e.target.result}" alt="Preview">
-                <div class="preview-text">${file.name}</div>
-            `;
+            // Create preview elements safely
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.alt = 'Preview';
+            
+            const previewText = document.createElement('div');
+            previewText.className = 'preview-text';
+            previewText.textContent = file.name;
+            
+            preview.innerHTML = '';
+            preview.appendChild(img);
+            preview.appendChild(previewText);
         };
         reader.readAsDataURL(file);
     } else {
@@ -1281,33 +1296,52 @@ function processBulkUpload() {
 
 function displayBulkUploadResults(results) {
     const resultsDiv = document.getElementById('bulk-upload-results');
-    let html = '';
+    
+    // Clear existing content
+    resultsDiv.innerHTML = '';
     
     if (results.success.length > 0) {
-        html += '<h4>✅ Successfully Uploaded:</h4><ul>';
+        const successH4 = document.createElement('h4');
+        successH4.textContent = '✅ Successfully Uploaded:';
+        resultsDiv.appendChild(successH4);
+        
+        const successUl = document.createElement('ul');
         results.success.forEach(name => {
-            html += `<li>${name}</li>`;
+            const li = document.createElement('li');
+            li.textContent = name;
+            successUl.appendChild(li);
         });
-        html += '</ul>';
+        resultsDiv.appendChild(successUl);
     }
     
     if (results.failed.length > 0) {
-        html += '<h4>❌ Failed to Match:</h4><ul>';
+        const failedH4 = document.createElement('h4');
+        failedH4.textContent = '❌ Failed to Match:';
+        resultsDiv.appendChild(failedH4);
+        
+        const failedUl = document.createElement('ul');
         results.failed.forEach(name => {
-            html += `<li>${name} - No matching intern found</li>`;
+            const li = document.createElement('li');
+            li.textContent = name + ' - No matching intern found';
+            failedUl.appendChild(li);
         });
-        html += '</ul>';
+        resultsDiv.appendChild(failedUl);
     }
     
     if (results.skipped.length > 0) {
-        html += '<h4>⏭️ Skipped:</h4><ul>';
+        const skippedH4 = document.createElement('h4');
+        skippedH4.textContent = '⏭️ Skipped:';
+        resultsDiv.appendChild(skippedH4);
+        
+        const skippedUl = document.createElement('ul');
         results.skipped.forEach(name => {
-            html += `<li>${name}</li>`;
+            const li = document.createElement('li');
+            li.textContent = name;
+            skippedUl.appendChild(li);
         });
-        html += '</ul>';
+        resultsDiv.appendChild(skippedUl);
     }
     
-    resultsDiv.innerHTML = html;
     resultsDiv.className = 'upload-results ' + (results.failed.length > 0 ? 'error' : 'success');
     resultsDiv.style.display = 'block';
     
@@ -1452,11 +1486,5 @@ function testImageDisplay() {
     }
 }
 
-// Initialize everything when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    initializeAuthentication();
-    initializeAdminPanel();
-    
-    // Test image display after a short delay
-    setTimeout(testImageDisplay, 1000);
-});
+// Test image display after a short delay
+setTimeout(testImageDisplay, 1000);
