@@ -13,15 +13,16 @@
     <meta property="og:type" content="website">
     <title>Reward Points - Resilient Privacy Inc.</title>
     <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
-    <link rel="stylesheet" href="styles.css?v=12.0.0">
+    <link rel="stylesheet" href="styles.css?v=22.0.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="config.js?v=3.0.0" defer></script>
+    <script src="script.js?v=8.0.0" defer></script>
 </head>
 <body>
     <!-- Login Toggle -->
     <div class="admin-toggle">
-        <button id="admin-toggle-btn" class="admin-btn">
+        <button id="admin-toggle-btn" class="admin-btn" onclick="simpleLogin();">
             <i class="fas fa-sign-in-alt"></i> Login
         </button>
     </div>
@@ -34,7 +35,7 @@
                 <p>Resilient Privacy Inc. - Reward System</p>
             </div>
             
-            <form id="login-form" class="login-form">
+            <form id="login-form" class="login-form" onsubmit="handleSimpleLogin(event)">
                 <div class="form-group">
                     <label for="username">Username:</label>
                     <input type="text" id="username" name="username" required>
@@ -56,7 +57,7 @@
             </form>
             
             <div class="login-footer">
-                <button id="cancel-login" class="cancel-btn">
+                <button id="cancel-login" class="cancel-btn" onclick="closeModal()">
                     <i class="fas fa-times"></i> Cancel
                 </button>
             </div>
@@ -446,112 +447,5 @@
         </footer>
     </div>
 
-    <script>
-        // Intern data with updated designations
-        const interns = [
-            { name: "Amrutha Pemmasani", points: 0, badges: [], headshot: null, designation: "SaaS Development Intern" },
-            { name: "Ankita Chouksey", points: 0, badges: [], headshot: null, designation: "Business Development Intern" },
-            { name: "Charan Kumar Rayaprolu", points: 0, badges: [], headshot: null, designation: "Market Strategist Intern" },
-            { name: "Dishant Modi", points: 0, badges: [], headshot: null, designation: "SaaS Development Intern" },
-            { name: "Ishan Mehta", points: 0, badges: [], headshot: null, designation: "SaaS Development Intern" },
-            { name: "Khushi Digarse", points: 0, badges: [], headshot: null, designation: "Project Manager and BDM Intern" },
-            { name: "Mrudula Jethe Bhanushali", points: 0, badges: [], headshot: null, designation: "AI/ML Intern" },
-            { name: "Nirusha Kandela", points: 0, badges: [], headshot: null, designation: "SaaS Development Intern" },
-            { name: "Nirmit Pradip Patel", points: 0, badges: [], headshot: null, designation: "SaaS Development Intern" },
-            { name: "Rachna Patel", points: 0, badges: [], headshot: null, designation: "Business Development Intern" },
-            { name: "Tanmayee Arigala", points: 0, badges: [], headshot: null, designation: "SaaS Development Intern" },
-            { name: "Varun Muriki", points: 0, badges: [], headshot: null, designation: "SaaS Development Intern" },
-            { name: "Zeel Patel", points: 0, badges: [], headshot: null, designation: "SaaS Development Intern" }
-        ];
-
-        function updateInternCards(interns) {
-            const cardsContainer = document.getElementById('intern-cards-grid');
-            if (!cardsContainer) return;
-            
-            cardsContainer.innerHTML = '';
-            
-            interns.forEach((intern, index) => {
-                const card = document.createElement('div');
-                card.className = 'intern-card';
-                card.innerHTML = `
-                    <div class="card-header">
-                        <div class="card-avatar">
-                            <span class="avatar-initials">${intern.name.split(' ').map(n => n[0]).join('')}</span>
-                        </div>
-                        <div class="card-info">
-                            <h3>${intern.name}</h3>
-                            <p class="designation">${intern.designation || 'Intern'}</p>
-                            <span class="rank no-rank">No Rank Yet</span>
-                        </div>
-                    </div>
-                    <div class="card-stats">
-                        <div class="stat-item">
-                            <h4>${intern.points}</h4>
-                            <p>Total Points</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>${intern.badges.length}</h4>
-                            <p>Achievements</p>
-                        </div>
-                    </div>
-                    <div class="card-badges">
-                        <span class="card-badge" style="background: #e2e8f0; color: #718096;">No badges yet</span>
-                    </div>
-                `;
-                
-                cardsContainer.appendChild(card);
-            });
-        }
-
-        function updateStats(interns) {
-            const totalPoints = interns.reduce((sum, intern) => sum + intern.points, 0);
-            const totalPointsElement = document.getElementById('total-points');
-            if (totalPointsElement) {
-                totalPointsElement.textContent = totalPoints;
-            }
-            
-            const topPerformerElement = document.getElementById('top-performer');
-            if (topPerformerElement) {
-                if (totalPoints === 0) {
-                    topPerformerElement.textContent = "Starting Soon!";
-                } else {
-                    const topPerformer = interns[0];
-                    topPerformerElement.textContent = topPerformer.name.split(' ')[0];
-                }
-            }
-        }
-
-        function updateLeaderboard(interns) {
-            const leaderboardContainer = document.getElementById('leaderboard-entries');
-            if (!leaderboardContainer) return;
-            
-            leaderboardContainer.innerHTML = '';
-            
-            interns.forEach((intern, index) => {
-                const entry = document.createElement('div');
-                entry.className = 'leaderboard-entry';
-                
-                entry.innerHTML = `
-                    <div class="rank-number">${index + 1}</div>
-                    <div class="intern-info">
-                        <div class="intern-name">${intern.name}</div>
-                        <div class="intern-designation">${intern.designation || 'Intern'}</div>
-                    </div>
-                    <div class="points-display">${intern.points}</div>
-                    <div class="badges-display">${intern.badges.length}</div>
-                `;
-                
-                leaderboardContainer.appendChild(entry);
-            });
-        }
-
-        // Initialize when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            const sortedInterns = [...interns].sort((a, b) => b.points - a.points);
-            updateStats(sortedInterns);
-            updateLeaderboard(sortedInterns);
-            updateInternCards(sortedInterns);
-        });
-    </script>
 </body>
 </html>

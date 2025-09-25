@@ -662,13 +662,12 @@ body::after {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
+    z-index: 9999;
     transition: opacity 0.3s ease;
 }
 
 .login-modal.hidden {
-    opacity: 0;
-    pointer-events: none;
+    display: none;
 }
 
 .login-content {

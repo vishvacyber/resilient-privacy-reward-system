@@ -11,33 +11,42 @@ let isAuthenticated = false;
 let sessionTimeout = null;
 let lastActivity = Date.now();
 
-// Intern data - 13 interns in alphabetical order (starting with zero points)
+// Intern data - 12 interns in alphabetical order (with 10 attendance points each)
 const interns = [
-    { name: "Amrutha Pemmasani", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Ankita Chouksey", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Business Development Intern" },
-    { name: "Charan Kumar Rayaprolu", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Dishant Modi", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Ishan Mehta", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Khushi Digarse", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Project Manager and BDM Intern" },
-    { name: "Mrudula Jethe Bhanushali", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Nirusha Kandela", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Nirmit Pradip Patel", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Rachna Patel", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Business Development Intern" },
-    { name: "Tanmayee Arigala", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Varun Muriki", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Zeel Patel", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" }
+    { name: "Amrutha Pemmasani", workCompletionPoints: 0, attendancePoints: 10, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Ankita Chouksey", workCompletionPoints: 0, attendancePoints: 10, badges: [], headshot: null, designation: "Business Development Intern" },
+    { name: "Charan Kumar Rayaprolu", workCompletionPoints: 0, attendancePoints: 10, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Dishant Modi", workCompletionPoints: 0, attendancePoints: 10, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Ishan Mehta", workCompletionPoints: 0, attendancePoints: 10, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Khushi Digarse", workCompletionPoints: 0, attendancePoints: 10, badges: [], headshot: null, designation: "Project Manager and BDM Intern" },
+    { name: "Mrudula Jethe Bhanushali", workCompletionPoints: 0, attendancePoints: 10, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Nirmit Pradip Patel", workCompletionPoints: 0, attendancePoints: 10, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Rachna Patel", workCompletionPoints: 0, attendancePoints: 10, badges: [], headshot: null, designation: "Business Development Intern" },
+    { name: "Tanmayee Arigala", workCompletionPoints: 0, attendancePoints: 10, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Varun Muriki", workCompletionPoints: 0, attendancePoints: 10, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Zeel Patel", workCompletionPoints: 0, attendancePoints: 10, badges: [], headshot: null, designation: "Software Development Intern" }
 ];
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded - Script is running!');
+    
+    // Clear any existing localStorage data to force fresh load
+    localStorage.removeItem('internData');
+    localStorage.removeItem('rewardData');
+    console.log('Cleared localStorage to force fresh data load');
+    
     // Load saved data if available
     loadSavedData();
     
     // Use the updated intern data (after loading from localStorage)
     const currentData = interns;
+    console.log('Current intern data:', currentData);
+    console.log('First intern attendance points:', currentData[0].attendancePoints);
     
     // Sort interns by total points (descending)
     const sortedInterns = [...currentData].sort((a, b) => (b.workCompletionPoints + b.attendancePoints) - (a.workCompletionPoints + a.attendancePoints));
+    console.log('Sorted interns:', sortedInterns);
     
     // Update stats
     updateStats(sortedInterns);
@@ -457,7 +466,16 @@ function initializeAuthentication() {
     }
     
     // Add event listeners for authentication
-    document.getElementById('admin-toggle-btn').addEventListener('click', handleAdminToggle);
+    const adminToggleBtn = document.getElementById('admin-toggle-btn');
+    console.log('Admin toggle button found:', adminToggleBtn);
+    
+    if (adminToggleBtn) {
+        adminToggleBtn.addEventListener('click', handleAdminToggle);
+        console.log('Event listener added to admin toggle button');
+    } else {
+        console.error('Admin toggle button not found!');
+    }
+    
     document.getElementById('login-form').addEventListener('submit', handleLogin);
     document.getElementById('cancel-login').addEventListener('click', closeLoginModal);
     
@@ -481,6 +499,7 @@ function initializeAuthentication() {
 }
 
 function handleAdminToggle() {
+    console.log('Admin toggle clicked, isAuthenticated:', isAuthenticated);
     if (isAuthenticated) {
         toggleAdminPanel();
     } else {
@@ -488,11 +507,86 @@ function handleAdminToggle() {
     }
 }
 
+// Make function globally available
+window.handleAdminToggle = handleAdminToggle;
+
+// Simple test function
+window.testLogin = function() {
+    console.log('Test login function called!');
+    alert('Login button is working!');
+    showLoginModal();
+};
+
+// Simple login function
+window.simpleLogin = function() {
+    const modal = document.getElementById('login-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+};
+
+// Simple close function
+window.closeModal = function() {
+    const modal = document.getElementById('login-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+};
+
+// Simple login form handler
+window.handleSimpleLogin = function(event) {
+    event.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    
+    if (username === 'Root' && password === 'RP@2025') {
+        alert('Login successful!');
+        closeModal();
+        showAdminPanel();
+    } else {
+        alert('Invalid credentials!');
+    }
+};
+
+// Show admin panel function
+window.showAdminPanel = function() {
+    const adminPanel = document.getElementById('admin-panel');
+    const adminToggle = document.querySelector('.admin-toggle');
+    
+    if (adminPanel) {
+        adminPanel.classList.remove('hidden');
+        console.log('Admin panel shown');
+    }
+    
+    if (adminToggle) {
+        adminToggle.innerHTML = '<button onclick="hideAdminPanel()" class="admin-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>';
+    }
+};
+
+// Hide admin panel function
+window.hideAdminPanel = function() {
+    const adminPanel = document.getElementById('admin-panel');
+    const adminToggle = document.querySelector('.admin-toggle');
+    
+    if (adminPanel) {
+        adminPanel.classList.add('hidden');
+    }
+    
+    if (adminToggle) {
+        adminToggle.innerHTML = '<button onclick="simpleLogin()" class="admin-btn"><i class="fas fa-sign-in-alt"></i> Login</button>';
+    }
+};
+
 function showLoginModal() {
+    console.log('showLoginModal called');
     const loginModal = document.getElementById('login-modal');
+    console.log('Login modal element:', loginModal);
     if (loginModal) {
+        console.log('Removing hidden class from login modal');
         loginModal.classList.remove('hidden');
         document.getElementById('username').focus();
+    } else {
+        console.error('Login modal not found!');
     }
 }
 
@@ -1557,3 +1651,17 @@ function testImageDisplay() {
 
 // Test image display after a short delay
 setTimeout(testImageDisplay, 1000);
+
+// Force clear all data and reload function
+window.forceReload = function() {
+    console.log('Force reloading data...');
+    localStorage.clear();
+    location.reload();
+};
+
+// Debug function to check current data
+window.debugData = function() {
+    console.log('Current interns data:', interns);
+    console.log('First intern:', interns[0]);
+    console.log('Total points calculation:', interns.reduce((sum, intern) => sum + intern.workCompletionPoints + intern.attendancePoints, 0));
+};
