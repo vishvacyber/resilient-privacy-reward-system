@@ -13,10 +13,10 @@
     <meta property="og:type" content="website">
     <title>Reward Points - Resilient Privacy Inc.</title>
     <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
-    <link rel="stylesheet" href="styles.css?v=2.0.0">
+    <link rel="stylesheet" href="styles.css?v=12.0.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="config.js" defer></script>
+    <script src="config.js?v=3.0.0" defer></script>
 </head>
 <body>
     <!-- Login Toggle -->
@@ -84,6 +84,13 @@
                     <label for="intern-select">Select Intern:</label>
                     <select id="intern-select">
                         <option value="">Choose an intern...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="point-type-select">Point Type:</label>
+                    <select id="point-type-select">
+                        <option value="workCompletion">Work Completion Points</option>
+                        <option value="attendance">Attendance Points</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -361,12 +368,14 @@
 
                 <!-- Full Leaderboard List -->
                 <div class="leaderboard-list">
-                    <div class="list-header">
-                        <span>Rank</span>
-                        <span>Intern Name</span>
-                        <span>Points</span>
-                        <span>Badges</span>
-                    </div>
+                <div class="list-header">
+                    <span>Rank</span>
+                    <span>Intern</span>
+                    <span>Work Points</span>
+                    <span>Attendance</span>
+                    <span>Total</span>
+                    <span>Badges</span>
+                </div>
                     <div id="leaderboard-entries">
                         <!-- Dynamic content will be inserted here -->
                     </div>

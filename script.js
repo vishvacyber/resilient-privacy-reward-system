@@ -13,19 +13,19 @@ let lastActivity = Date.now();
 
 // Intern data - 13 interns in alphabetical order (starting with zero points)
 const interns = [
-    { name: "Amrutha Pemmasani", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Ankita Chouksey", points: 0, badges: [], headshot: null, designation: "Business Development Intern" },
-    { name: "Charan Kumar Rayaprolu", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Dishant Modi", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Ishan Mehta", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Khushi Digarse", points: 0, badges: [], headshot: null, designation: "Project Manager and BDM Intern" },
-    { name: "Mrudula Jethe Bhanushali", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Nirusha Kandela", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Nirmit Pradip Patel", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Rachna Patel", points: 0, badges: [], headshot: null, designation: "Business Development Intern" },
-    { name: "Tanmayee Arigala", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Varun Muriki", points: 0, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Zeel Patel", points: 0, badges: [], headshot: null, designation: "Software Development Intern" }
+    { name: "Amrutha Pemmasani", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Ankita Chouksey", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Business Development Intern" },
+    { name: "Charan Kumar Rayaprolu", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Dishant Modi", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Ishan Mehta", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Khushi Digarse", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Project Manager and BDM Intern" },
+    { name: "Mrudula Jethe Bhanushali", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Nirusha Kandela", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Nirmit Pradip Patel", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Rachna Patel", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Business Development Intern" },
+    { name: "Tanmayee Arigala", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Varun Muriki", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Zeel Patel", workCompletionPoints: 0, attendancePoints: 0, badges: [], headshot: null, designation: "Software Development Intern" }
 ];
 
 // Initialize the application
@@ -33,11 +33,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load saved data if available
     loadSavedData();
     
-    // Use actual intern data (starting with zero points)
+    // Use the updated intern data (after loading from localStorage)
     const currentData = interns;
     
-    // Sort interns by points (descending)
-    const sortedInterns = [...currentData].sort((a, b) => b.points - a.points);
+    // Sort interns by total points (descending)
+    const sortedInterns = [...currentData].sort((a, b) => (b.workCompletionPoints + b.attendancePoints) - (a.workCompletionPoints + a.attendancePoints));
     
     // Update stats
     updateStats(sortedInterns);
@@ -66,26 +66,39 @@ function loadSavedData() {
         const savedData = localStorage.getItem('rewardData');
         if (savedData) {
             const data = JSON.parse(savedData);
+            console.log('Loading saved data:', data);
             if (data.interns && Array.isArray(data.interns)) {
                 // Update interns with saved data
                 data.interns.forEach(savedIntern => {
                     const existingIntern = interns.find(i => i.name === savedIntern.name);
                     if (existingIntern) {
-                        existingIntern.points = savedIntern.points || 0;
+                        // Handle migration from old points structure
+                        if (savedIntern.points !== undefined && savedIntern.workCompletionPoints === undefined) {
+                            // Migrate old points to work completion points
+                            existingIntern.workCompletionPoints = savedIntern.points || 0;
+                            existingIntern.attendancePoints = 0;
+                            console.log(`Migrated ${savedIntern.name}: ${savedIntern.points} points to work completion`);
+                        } else {
+                            existingIntern.workCompletionPoints = savedIntern.workCompletionPoints || 0;
+                            existingIntern.attendancePoints = savedIntern.attendancePoints || 0;
+                            console.log(`Loaded ${savedIntern.name}: Work=${savedIntern.workCompletionPoints}, Attendance=${savedIntern.attendancePoints}`);
+                        }
                         existingIntern.badges = savedIntern.badges || [];
                         existingIntern.headshot = savedIntern.headshot || null;
                         existingIntern.designation = savedIntern.designation || "Software Development Intern";
                     }
                 });
             }
+        } else {
+            console.log('No saved data found, using default values');
         }
     } catch (error) {
-        // Silently handle missing or corrupted data
+        console.error('Error loading saved data:', error);
     }
 }
 
 function updateStats(interns) {
-    const totalPoints = interns.reduce((sum, intern) => sum + intern.points, 0);
+    const totalPoints = interns.reduce((sum, intern) => sum + intern.workCompletionPoints + intern.attendancePoints, 0);
     const topPerformer = interns[0];
     
     // Animate total points counter
@@ -95,8 +108,8 @@ function updateStats(interns) {
     if (totalPoints === 0) {
         document.getElementById('top-performer').textContent = "Starting Soon!";
     } else {
-        const topScore = topPerformer.points;
-        const topPerformers = interns.filter(intern => intern.points === topScore);
+        const topScore = topPerformer.workCompletionPoints + topPerformer.attendancePoints;
+        const topPerformers = interns.filter(intern => (intern.workCompletionPoints + intern.attendancePoints) === topScore);
         if (topPerformers.length > 1) {
             document.getElementById('top-performer').textContent = "Tie!";
         } else {
@@ -115,8 +128,12 @@ function updatePodium(interns) {
     const second = interns[1];
     const third = interns[2];
     
+    const firstTotal = first.workCompletionPoints + first.attendancePoints;
+    const secondTotal = second ? second.workCompletionPoints + second.attendancePoints : 0;
+    const thirdTotal = third ? third.workCompletionPoints + third.attendancePoints : 0;
+    
     // Show "TBD" for podium when everyone has zero points
-    if (first.points === 0) {
+    if (firstTotal === 0) {
         document.getElementById('first-place').textContent = "TBD";
         document.getElementById('first-points').textContent = "0 pts";
         
@@ -128,21 +145,21 @@ function updatePodium(interns) {
     } else {
         // First place always shows if they have points
         document.getElementById('first-place').textContent = first.name;
-        document.getElementById('first-points').textContent = `${first.points} pts`;
+        document.getElementById('first-points').textContent = `${firstTotal} pts`;
         
         // Second place shows only if they have points
-        if (second && second.points > 0) {
+        if (second && secondTotal > 0) {
             document.getElementById('second-place').textContent = second.name;
-            document.getElementById('second-points').textContent = `${second.points} pts`;
+            document.getElementById('second-points').textContent = `${secondTotal} pts`;
         } else {
             document.getElementById('second-place').textContent = "TBD";
             document.getElementById('second-points').textContent = "0 pts";
         }
         
         // Third place shows only if they have points
-        if (third && third.points > 0) {
+        if (third && thirdTotal > 0) {
             document.getElementById('third-place').textContent = third.name;
-            document.getElementById('third-points').textContent = `${third.points} pts`;
+            document.getElementById('third-points').textContent = `${thirdTotal} pts`;
         } else {
             document.getElementById('third-place').textContent = "TBD";
             document.getElementById('third-points').textContent = "0 pts";
@@ -181,9 +198,18 @@ function updateLeaderboard(interns) {
         internInfoDiv.appendChild(nameDiv);
         internInfoDiv.appendChild(designationDiv);
         
-        const pointsDiv = document.createElement('div');
-        pointsDiv.className = 'points-display';
-        pointsDiv.textContent = intern.points;
+        // Create separate point columns
+        const workPointsDiv = document.createElement('div');
+        workPointsDiv.className = 'points-display work-points';
+        workPointsDiv.textContent = intern.workCompletionPoints;
+        
+        const attendancePointsDiv = document.createElement('div');
+        attendancePointsDiv.className = 'points-display attendance-points';
+        attendancePointsDiv.textContent = intern.attendancePoints;
+        
+        const totalPointsDiv = document.createElement('div');
+        totalPointsDiv.className = 'points-display total-points';
+        totalPointsDiv.textContent = intern.workCompletionPoints + intern.attendancePoints;
         
         const badgesDiv = document.createElement('div');
         badgesDiv.className = 'badges-display';
@@ -195,7 +221,9 @@ function updateLeaderboard(interns) {
         
         entry.appendChild(rankDiv);
         entry.appendChild(internInfoDiv);
-        entry.appendChild(pointsDiv);
+        entry.appendChild(workPointsDiv);
+        entry.appendChild(attendancePointsDiv);
+        entry.appendChild(totalPointsDiv);
         entry.appendChild(badgesDiv);
         
         leaderboardContainer.appendChild(entry);
@@ -223,13 +251,21 @@ function updateInternCards(interns) {
                 </div>
             </div>
             <div class="card-stats">
-                <div class="stat-item">
-                    <h4>${intern.points}</h4>
+                <div class="stat-item main-stat">
+                    <h4>${intern.workCompletionPoints + intern.attendancePoints}</h4>
                     <p>Total Points</p>
                 </div>
                 <div class="stat-item">
+                    <h4>${intern.workCompletionPoints}</h4>
+                    <p>Work</p>
+                </div>
+                <div class="stat-item">
+                    <h4>${intern.attendancePoints}</h4>
+                    <p>Attendance</p>
+                </div>
+                <div class="stat-item">
                     <h4>${intern.badges.length}</h4>
-                    <p>Achievements</p>
+                    <p>Badges</p>
                 </div>
             </div>
             <div class="card-badges">
@@ -345,16 +381,21 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Function to add points to an intern (for when you start awarding points)
-function addPoints(internName, points, badge = null) {
+function addPoints(internName, points, pointType = 'workCompletion', badge = null) {
     const intern = interns.find(i => i.name === internName);
     if (intern) {
-        intern.points += points;
+        if (pointType === 'attendance') {
+            intern.attendancePoints += points;
+        } else {
+            intern.workCompletionPoints += points;
+        }
+        
         if (badge && !intern.badges.includes(badge)) {
             intern.badges.push(badge);
         }
         
         // Re-sort and update display
-        const sortedInterns = [...interns].sort((a, b) => b.points - a.points);
+        const sortedInterns = [...interns].sort((a, b) => (b.workCompletionPoints + b.attendancePoints) - (a.workCompletionPoints + a.attendancePoints));
         updateStats(sortedInterns);
         updatePodium(sortedInterns);
         updateLeaderboard(sortedInterns);
@@ -379,12 +420,13 @@ function resetAllPoints() {
     }
     
     interns.forEach(intern => {
-        intern.points = 0;
+        intern.workCompletionPoints = 0;
+        intern.attendancePoints = 0;
         intern.badges = [];
     });
     
     // Re-sort and update display
-    const sortedInterns = [...interns].sort((a, b) => b.points - a.points);
+    const sortedInterns = [...interns].sort((a, b) => (b.workCompletionPoints + b.attendancePoints) - (a.workCompletionPoints + a.attendancePoints));
     updateStats(sortedInterns);
     updatePodium(sortedInterns);
     updateLeaderboard(sortedInterns);
@@ -690,6 +732,7 @@ function awardPoints() {
     
     const internName = document.getElementById('intern-select').value;
     const points = parseInt(document.getElementById('points-input').value);
+    const pointType = document.getElementById('point-type-select').value;
     
     if (!internName || !points || points <= 0) {
         showMessage('Please select an intern and enter positive points!', 'error');
@@ -697,14 +740,15 @@ function awardPoints() {
     }
     
     // Add points using existing function
-    addPoints(internName, points, null);
+    addPoints(internName, points, pointType, null);
     
     // Clear form
     document.getElementById('intern-select').value = '';
     document.getElementById('points-input').value = '';
     
     // Show success message
-    showMessage(`Successfully awarded ${points} points to ${internName}!`, 'success');
+    const pointTypeName = pointType === 'attendance' ? 'attendance' : 'work completion';
+    showMessage(`Successfully awarded ${points} ${pointTypeName} points to ${internName}!`, 'success');
 }
 
 function removePoints() {
@@ -716,6 +760,7 @@ function removePoints() {
     
     const internName = document.getElementById('intern-select').value;
     const points = parseInt(document.getElementById('points-input').value);
+    const pointType = document.getElementById('point-type-select').value;
     
     if (!internName || !points || points <= 0) {
         showMessage('Please select an intern and enter positive points to remove!', 'error');
@@ -730,17 +775,26 @@ function removePoints() {
     }
     
     // Check if removing points would result in negative total
-    if (intern.points - points < 0) {
-        if (!confirm(`This will reduce ${internName}'s points to 0. Continue?`)) {
+    const currentPoints = pointType === 'attendance' ? intern.attendancePoints : intern.workCompletionPoints;
+    if (currentPoints - points < 0) {
+        if (!confirm(`This will reduce ${internName}'s ${pointType === 'attendance' ? 'attendance' : 'work completion'} points to 0. Continue?`)) {
             return;
         }
-        intern.points = 0;
+        if (pointType === 'attendance') {
+            intern.attendancePoints = 0;
+        } else {
+            intern.workCompletionPoints = 0;
+        }
     } else {
-        intern.points -= points;
+        if (pointType === 'attendance') {
+            intern.attendancePoints -= points;
+        } else {
+            intern.workCompletionPoints -= points;
+        }
     }
     
     // Re-sort and update display
-    const sortedInterns = [...interns].sort((a, b) => b.points - a.points);
+    const sortedInterns = [...interns].sort((a, b) => (b.workCompletionPoints + b.attendancePoints) - (a.workCompletionPoints + a.attendancePoints));
     updateStats(sortedInterns);
     updatePodium(sortedInterns);
     updateLeaderboard(sortedInterns);
@@ -752,7 +806,8 @@ function removePoints() {
     document.getElementById('points-input').value = '';
     
     // Show success message
-    showMessage(`Successfully removed ${points} points from ${internName}!`, 'success');
+    const pointTypeName = pointType === 'attendance' ? 'attendance' : 'work completion';
+    showMessage(`Successfully removed ${points} ${pointTypeName} points from ${internName}!`, 'success');
 }
 
 function addBadge() {
@@ -882,7 +937,8 @@ function addUser() {
             // Add new intern with headshot
             const newIntern = {
                 name: newUserName,
-                points: 0,
+                workCompletionPoints: 0,
+                attendancePoints: 0,
                 badges: [],
                 headshot: headshotDataUrl,
                 designation: "Software Development Intern"
@@ -921,7 +977,8 @@ function addUser() {
         // Add new intern without headshot
         const newIntern = {
             name: newUserName,
-            points: 0,
+            workCompletionPoints: 0,
+            attendancePoints: 0,
             badges: [],
             headshot: null,
             designation: "Software Development Intern"
@@ -1046,15 +1103,17 @@ function saveData() {
     }
     
     try {
-        // Save to localStorage
-        localStorage.setItem('rewardData', JSON.stringify({
+        const dataToSave = {
             interns: interns,
             lastSaved: new Date().toISOString(),
             version: '2.1.1'
-        }));
-        
+        };
+        console.log('Saving data manually:', dataToSave);
+        localStorage.setItem('rewardData', JSON.stringify(dataToSave));
+        console.log('Data saved successfully to localStorage');
         showMessage('Data saved successfully!', 'success');
     } catch (error) {
+        console.error('Error saving data:', error);
         showMessage('Error saving data!', 'error');
     }
 }
@@ -1062,18 +1121,21 @@ function saveData() {
 function saveDataSilently() {
     // Save data without showing messages (for automatic saves)
     try {
-        localStorage.setItem('rewardData', JSON.stringify({
+        const dataToSave = {
             interns: interns,
             lastSaved: new Date().toISOString(),
             version: '2.1.1'
-        }));
+        };
+        console.log('Saving data silently:', dataToSave);
+        localStorage.setItem('rewardData', JSON.stringify(dataToSave));
+        console.log('Data saved successfully to localStorage');
     } catch (error) {
         console.error('Error saving data silently:', error);
     }
 }
 
 function updateAdminStats(interns) {
-    const totalPoints = interns.reduce((sum, intern) => sum + intern.points, 0);
+    const totalPoints = interns.reduce((sum, intern) => sum + intern.workCompletionPoints + intern.attendancePoints, 0);
     const topPerformer = interns[0];
     
     document.getElementById('admin-total-points').textContent = totalPoints;
@@ -1081,8 +1143,8 @@ function updateAdminStats(interns) {
     if (totalPoints === 0) {
         document.getElementById('admin-top-performer').textContent = "Starting Soon!";
     } else {
-        const topScore = topPerformer.points;
-        const topPerformers = interns.filter(intern => intern.points === topScore);
+        const topScore = topPerformer.workCompletionPoints + topPerformer.attendancePoints;
+        const topPerformers = interns.filter(intern => (intern.workCompletionPoints + intern.attendancePoints) === topScore);
         if (topPerformers.length > 1) {
             document.getElementById('admin-top-performer').textContent = "Tie!";
         } else {
@@ -1161,13 +1223,20 @@ function importData() {
                     data.interns.forEach(importedIntern => {
                         const existingIntern = interns.find(i => i.name === importedIntern.name);
                         if (existingIntern) {
-                            existingIntern.points = importedIntern.points || 0;
+                            // Handle migration from old points structure
+                            if (importedIntern.points !== undefined && importedIntern.workCompletionPoints === undefined) {
+                                existingIntern.workCompletionPoints = importedIntern.points || 0;
+                                existingIntern.attendancePoints = 0;
+                            } else {
+                                existingIntern.workCompletionPoints = importedIntern.workCompletionPoints || 0;
+                                existingIntern.attendancePoints = importedIntern.attendancePoints || 0;
+                            }
                             existingIntern.badges = importedIntern.badges || [];
                         }
                     });
                     
                     // Update display
-                    const sortedInterns = [...interns].sort((a, b) => b.points - a.points);
+                    const sortedInterns = [...interns].sort((a, b) => (b.workCompletionPoints + b.attendancePoints) - (a.workCompletionPoints + a.attendancePoints));
                     updateStats(sortedInterns);
                     updatePodium(sortedInterns);
                     updateLeaderboard(sortedInterns);
@@ -1373,7 +1442,7 @@ function clearAllHeadshots() {
 }
 
 function updateAllDisplays() {
-    const sortedInterns = [...interns].sort((a, b) => b.points - a.points);
+    const sortedInterns = [...interns].sort((a, b) => (b.workCompletionPoints + b.attendancePoints) - (a.workCompletionPoints + a.attendancePoints));
     
     // Batch DOM updates for better performance
     requestAnimationFrame(() => {
