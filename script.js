@@ -13,15 +13,15 @@ let lastActivity = Date.now();
 
 // Intern data - 12 interns in alphabetical order (with 5 attendance points each after deduction)
 const interns = [
-    { name: "Amrutha Pemmasani", workCompletionPoints: 25, attendancePoints: 5, badges: [], headshot: null, designation: "Software Development Intern" },
+    { name: "Amrutha Pemmasani", workCompletionPoints: 25, attendancePoints: 5, badges: ["gold"], headshot: null, designation: "Software Development Intern" },
     { name: "Ankita Chouksey", workCompletionPoints: 5, attendancePoints: 5, badges: [], headshot: null, designation: "Business Development Intern" },
     { name: "Charan Kumar Rayaprolu", workCompletionPoints: 0, attendancePoints: 5, badges: [], headshot: null, designation: "Software Development Intern" },
     { name: "Dishant Modi", workCompletionPoints: 10, attendancePoints: 5, badges: [], headshot: null, designation: "Software Development Intern" },
     { name: "Ishan Mehta", workCompletionPoints: 15, attendancePoints: 5, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Khushi Digarse", workCompletionPoints: 25, attendancePoints: 5, badges: [], headshot: null, designation: "Project Manager and BDM Intern" },
+    { name: "Khushi Digarse", workCompletionPoints: 25, attendancePoints: 5, badges: ["gold"], headshot: null, designation: "Project Manager and BDM Intern" },
     { name: "Mrudula Jethe Bhanushali", workCompletionPoints: 5, attendancePoints: 5, badges: [], headshot: null, designation: "Software Development Intern" },
     { name: "Nirmit Pradip Patel", workCompletionPoints: 10, attendancePoints: 5, badges: [], headshot: null, designation: "Software Development Intern" },
-    { name: "Rachna Patel", workCompletionPoints: 25, attendancePoints: 5, badges: [], headshot: null, designation: "Business Development Intern" },
+    { name: "Rachna Patel", workCompletionPoints: 25, attendancePoints: 5, badges: ["gold"], headshot: null, designation: "Business Development Intern" },
     { name: "Tanmayee Arigala", workCompletionPoints: 0, attendancePoints: 5, badges: [], headshot: null, designation: "Software Development Intern" },
     { name: "Varun Muriki", workCompletionPoints: 0, attendancePoints: 5, badges: [], headshot: null, designation: "Software Development Intern" },
     { name: "Zeel Patel", workCompletionPoints: 20, attendancePoints: 5, badges: [], headshot: null, designation: "Software Development Intern" }
