@@ -181,13 +181,35 @@ function updateLeaderboard(interns) {
     const leaderboardContainer = document.getElementById('leaderboard-entries');
     leaderboardContainer.innerHTML = '';
     
+    // Calculate proper ranks with ties
+    let currentRank = 1;
+    let previousScore = null;
+    const internRanks = [];
+    
     interns.forEach((intern, index) => {
+        const currentScore = intern.workCompletionPoints + intern.attendancePoints;
+        
+        if (previousScore !== null && currentScore < previousScore) {
+            currentRank = index + 1; // Jump to next available rank after ties
+        }
+        
+        internRanks.push({
+            intern: intern,
+            rank: currentRank,
+            score: currentScore
+        });
+        
+        previousScore = currentScore;
+    });
+    
+    internRanks.forEach((internRank, index) => {
         const entry = document.createElement('div');
         entry.className = 'leaderboard-entry';
         entry.style.animationDelay = `${index * 0.1}s`;
         
-        const rank = index + 1;
+        const rank = internRank.rank;
         const rankClass = rank <= 3 ? 'top-three' : '';
+        const intern = internRank.intern;
         
         // Create elements safely to avoid XSS
         const rankDiv = document.createElement('div');
