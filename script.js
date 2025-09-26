@@ -137,6 +137,8 @@ function updatePodium(interns) {
     const second = interns[1];
     const third = interns[2];
     
+    if (!first) return;
+    
     const firstTotal = first.workCompletionPoints + first.attendancePoints;
     const secondTotal = second ? second.workCompletionPoints + second.attendancePoints : 0;
     const thirdTotal = third ? third.workCompletionPoints + third.attendancePoints : 0;
@@ -152,26 +154,82 @@ function updatePodium(interns) {
         document.getElementById('third-place').textContent = "TBD";
         document.getElementById('third-points').textContent = "0 pts";
     } else {
-        // First place always shows if they have points
-        document.getElementById('first-place').textContent = first.name;
-        document.getElementById('first-points').textContent = `${firstTotal} pts`;
+        // Group people by score to handle ties properly
+        const topScorers = [];
         
-        // Second place shows only if they have points
-        if (second && secondTotal > 0) {
-            document.getElementById('second-place').textContent = second.name;
-            document.getElementById('second-points').textContent = `${secondTotal} pts`;
-        } else {
-            document.getElementById('second-place').textContent = "TBD";
-            document.getElementById('second-points').textContent = "0 pts";
+        // Find all people with top score
+        const topScore = firstTotal;
+        for (let intern of interns) {
+            const internTotal = intern.workCompletionPoints + intern.attendancePoints;
+            if (internTotal === topScore) {
+                topScorers.push(intern);
+            } else {
+                break; // Stop when we hit a different score
+            }
         }
         
-        // Third place shows only if they have points
-        if (third && thirdTotal > 0) {
-            document.getElementById('third-place').textContent = third.name;
-            document.getElementById('third-points').textContent = `${thirdTotal} pts`;
+        // If multiple people tied for first, show them as co-champions
+        if (topScorers.length > 1) {
+            // Show tied winners in first position
+            const firstNames = topScorers.map(intern => intern.name.split(' ')[0]).join(', ');
+            document.getElementById('first-place').textContent = firstNames;
+            document.getElementById('first-points').textContent = `${topScore} pts`;
+            
+            // Find next unique score for second place
+            let nextPlaceIntern = null;
+            for (let i = topScorers.length; i < interns.length; i++) {
+                if (interns[i]) {
+                    nextPlaceIntern = interns[i];
+                    break;
+                }
+            }
+            
+            if (nextPlaceIntern && (nextPlaceIntern.workCompletionPoints + nextPlaceIntern.attendancePoints) > 0) {
+                document.getElementById('second-place').textContent = nextPlaceIntern.name;
+                document.getElementById('second-points').textContent = `${nextPlaceIntern.workCompletionPoints + nextPlaceIntern.attendancePoints} pts`;
+            } else {
+                document.getElementById('second-place').textContent = "TBD";
+                document.getElementById('second-points').textContent = "0 pts";
+            }
+            
+            // Find intern for third place
+            let thirdPlaceIntern = null;
+            const secondPlaceScore = nextPlaceIntern ? nextPlaceIntern.workCompletionPoints + nextPlaceIntern.attendancePoints : 0;
+            
+            for (let i = topScorers.length; i < interns.length; i++) {
+                if (interns[i] && (interns[i].workCompletionPoints + interns[i].attendancePoints) < secondPlaceScore && (interns[i].workCompletionPoints + interns[i].attendancePoints) > 0) {
+                    thirdPlaceIntern = interns[i];
+                    break;
+                }
+            }
+            
+            if (thirdPlaceIntern) {
+                document.getElementById('third-place').textContent = thirdPlaceIntern.name;
+                document.getElementById('third-points').textContent = `${thirdPlaceIntern.workCompletionPoints + thirdPlaceIntern.attendancePoints} pts`;
+            } else {
+                document.getElementById('third-place').textContent = "TBD";
+                document.getElementById('third-points').textContent = "0 pts";
+            }
         } else {
-            document.getElementById('third-place').textContent = "TBD";
-            document.getElementById('third-points').textContent = "0 pts";
+            // No ties - show normally
+            document.getElementById('first-place').textContent = first.name;
+            document.getElementById('first-points').textContent = `${firstTotal} pts`;
+            
+            if (second && secondTotal > 0) {
+                document.getElementById('second-place').textContent = second.name;
+                document.getElementById('second-points').textContent = `${secondTotal} pts`;
+            } else {
+                document.getElementById('second-place').textContent = "TBD";
+                document.getElementById('second-points').textContent = "0 pts";
+            }
+            
+            if (third && thirdTotal > 0) {
+                document.getElementById('third-place').textContent = third.name;
+                document.getElementById('third-points').textContent = `${thirdTotal} pts`;
+            } else {
+                document.getElementById('third-place').textContent = "TBD";
+                document.getElementById('third-points').textContent = "0 pts";
+            }
         }
     }
 }
